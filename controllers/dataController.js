@@ -4,12 +4,14 @@ const obtenerDatosChart = async (req, res) => {
     try {
         // Recibir datos del cuerpo de la solicitud
         const celda = req.body.celda;
-        const columna = req.body.columna;
-        
+        const columna = req.body.columnas;
+
+
+
         if (celda && columna) {
             const sql = `SELECT ?? FROM ?? ORDER BY fecha_registro DESC LIMIT 1`;
             const values = [columna, celda];
-            
+
             pool.query(sql, values, (err, result) => {
                 if (err) {
                     res.status(500).json({ error: "Error executing query: " + err });
