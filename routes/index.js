@@ -4,8 +4,8 @@ const {obtenerDatosChart,exportarExcel,promedioCatorceDias} = require('../contro
 
 
 // Definición de la ruta para obtener datos
-router.get('/datosChart', obtenerDatosChart); //Funcion dentro de la API PHP: apichart
-router.get('/exportExcel', exportarExcel); //Funcion dentro de la API PHP: apiExport
-router.get('/promedioCatorce', promedioCatorceDias); //Funcion dentro de la API PHP: Apirestful
+router.post('/datosChart', obtenerDatosChart); //Funcion dentro de la API PHP: apichart
+router.post('/exportExcel', exportarExcel); //Funcion dentro de la API PHP: apiExport
+router.post('/promedioCatorce', promedioCatorceDias); //Funcion dentro de la API PHP: Apirestful
 
 module.exports = router; 
