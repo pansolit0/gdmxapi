@@ -2,14 +2,15 @@ const pool = require('../config/db.config');
 
 const obtenerDatosChart = async (req, res) => {
     try {
-        // Recibir datos del body de la solicitud
+        // Recibir datos del cuerpo de la solicitud
         const celda = req.body.celda;
         const columna = req.body.columnas;
 
         if (celda && columna) {
-            // Modificación para filtrar valores nulos, cadenas vacías y valores 0 antes de seleccionar el último disponible.
-            const sql = `SELECT * FROM (SELECT ?? FROM ?? WHERE ?? IS NOT NULL AND ?? != '' AND ?? != 0 ORDER BY fecha_registro DESC) AS filtered_table LIMIT 1`;
-            const values = [columna, celda, columna, columna, columna]; // Ajustado para incluir el filtrado de 0
+            // Modificar la consulta SQL para excluir los valores 0 en la columna especificada
+            const sql = `SELECT ?? FROM ?? WHERE ?? <> 0 ORDER BY fecha_registro DESC LIMIT 1`;
+            // Se añade el nombre de la columna nuevamente en los valores para la cláusula WHERE
+            const values = [columna, celda, columna];
 
             pool.query(sql, values, (err, result) => {
                 if (err) {
@@ -17,7 +18,7 @@ const obtenerDatosChart = async (req, res) => {
                 } else if (result.length > 0) {
                     res.json(result[0]);
                 } else {
-                    res.status(404).json({ error: "No data found after filtering invalid entries" });
+                    res.status(404).json({ error: "No data found" });
                 }
             });
         } else {
@@ -27,6 +28,8 @@ const obtenerDatosChart = async (req, res) => {
         res.status(500).send(error.message);
     }
 };
+
+
 
 const exportarExcel = async (req, res) => {
     try {
