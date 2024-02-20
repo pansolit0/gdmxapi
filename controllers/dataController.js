@@ -7,9 +7,9 @@ const obtenerDatosChart = async (req, res) => {
         const columna = req.body.columnas;
 
         if (celda && columna) {
-            // Modificar la consulta SQL para excluir los valores 0 en la columna especificada
+            // Modificar la consulta para filtrar los valores no cero
             const sql = `SELECT ?? FROM ?? WHERE ?? <> 0 ORDER BY fecha_registro DESC LIMIT 1`;
-            // Se añade el nombre de la columna nuevamente en los valores para la cláusula WHERE
+            // Se pasa la columna dos veces, una para seleccionar y otra para el filtro de no cero
             const values = [columna, celda, columna];
 
             pool.query(sql, values, (err, result) => {
@@ -28,6 +28,7 @@ const obtenerDatosChart = async (req, res) => {
         res.status(500).send(error.message);
     }
 };
+
 
 
 
