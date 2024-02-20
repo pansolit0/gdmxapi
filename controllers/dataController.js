@@ -6,8 +6,6 @@ const obtenerDatosChart = async (req, res) => {
         const celda = req.body.celda;
         const columna = req.body.columnas;
 
-
-
         if (celda && columna) {
             const sql = `SELECT ?? FROM ?? ORDER BY fecha_registro DESC LIMIT 1`;
             const values = [columna, celda];
