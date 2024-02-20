@@ -6,11 +6,11 @@ const obtenerDatosChart = async (req, res) => {
         const celda = req.body.celda;
         const columna = req.body.columnas;
 
+
+
         if (celda && columna) {
-            // Modificar la consulta para filtrar los valores no cero
-            const sql = `SELECT ?? FROM ?? WHERE ?? <> 0 ORDER BY fecha_registro DESC LIMIT 1`;
-            // Se pasa la columna dos veces, una para seleccionar y otra para el filtro de no cero
-            const values = [columna, celda, columna];
+            const sql = `SELECT ?? FROM ?? ORDER BY fecha_registro DESC LIMIT 1`;
+            const values = [columna, celda];
 
             pool.query(sql, values, (err, result) => {
                 if (err) {
@@ -28,9 +28,6 @@ const obtenerDatosChart = async (req, res) => {
         res.status(500).send(error.message);
     }
 };
-
-
-
 
 const exportarExcel = async (req, res) => {
     try {
