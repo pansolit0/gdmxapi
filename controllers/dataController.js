@@ -7,19 +7,28 @@ const obtenerDatosChart = async (req, res) => {
         const columna = req.body.columnas;
 
         if (celda && columna) {
-            // Construir la consulta para excluir valores cero de la columna especificada y obtener el último valor distinto de cero
-            const sql = `
-                SELECT * FROM (
-                    SELECT ??, ?? FROM ?? 
-                    WHERE ?? != 0 
+            let sql;
+            let values;
+
+            // Aplicar lógica condicional basada en la columna especificada
+            if (columna === 'jg') {
+                // Consulta especial para 'jg' para obtener el último valor distinto de cero
+                sql = `
+                    SELECT * FROM (
+                        SELECT ??, ?? FROM ?? 
+                        WHERE ?? != 0 
+                        ORDER BY fecha_registro DESC
+                    ) AS filtered_table
+                    GROUP BY ??
                     ORDER BY fecha_registro DESC
-                ) AS filtered_table
-                GROUP BY ??
-                ORDER BY fecha_registro DESC
-                LIMIT 1
-            `;
-            // Añadir el nombre de la columna cuatro veces a los valores, uno para la selección y otro para la condición WHERE, y luego para GROUP BY y ORDER BY
-            const values = [columna, celda, celda, columna, columna];
+                    LIMIT 1
+                `;
+                values = [columna, celda, celda, columna, columna];
+            } else {
+                // Consulta estándar para otras columnas
+                sql = 'SELECT ??, ?? FROM ?? ORDER BY fecha_registro DESC LIMIT 1';
+                values = [columna, celda, celda];
+            }
 
             pool.query(sql, values, (err, result) => {
                 if (err) {
@@ -37,6 +46,7 @@ const obtenerDatosChart = async (req, res) => {
         res.status(500).send(error.message);
     }
 };
+
 
 
 
