@@ -8,7 +8,7 @@ const obtenerDatosChart = async (req, res) => {
 
         if (celda && columna) {
             // Actualizar la consulta para excluir valores cero de la columna especificada
-            const sql = `SELECT ?? FROM ?? WHERE jg != 0 ORDER BY fecha_registro DESC LIMIT 1`;
+            const sql = `SELECT ?? FROM ?? WHERE jg != 0 OR hf != 0 ORDER BY fecha_registro DESC LIMIT 1`;
             // Añadir el nombre de la columna dos veces a los valores, uno para la selección y otro para la condición WHERE
             const values = [columna, celda, columna];
 
