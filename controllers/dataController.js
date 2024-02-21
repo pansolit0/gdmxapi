@@ -8,7 +8,7 @@ const obtenerDatosChart = async (req, res) => {
 
         if (celda && columna) {
             // Inicializar la consulta SQL base
-            let sql = `SELECT ?? FROM ?? WHERE jg != 0 ORDER BY fecha_registro DESC LIMIT 1`;
+            let sql = `SELECT ?? FROM ?? WHERE ?? != 0 ORDER BY fecha_registro DESC LIMIT 1`;
 
             // Determinar si la consulta involucra la columna 'jg'
             if (columna === 'jg') {
