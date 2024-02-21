@@ -7,9 +7,19 @@ const obtenerDatosChart = async (req, res) => {
         const columna = req.body.columnas;
 
         if (celda && columna) {
-            // Actualizar la consulta para excluir valores cero de la columna especificada
-            const sql = SELECT ?? FROM ?? WHERE jg != 0 OR hf != 0 ORDER BY fecha_registro DESC LIMIT 1;
-            // Añadir el nombre de la columna dos veces a los valores, uno para la selección y otro para la condición WHERE
+            // Inicializar la consulta SQL base
+            let sql = `SELECT ?? FROM ?? WHERE jg != 0 ORDER BY fecha_registro DESC LIMIT 1`;
+
+            // Determinar si la consulta involucra la columna 'jg'
+            if (columna === 'jg') {
+                // Modificar la consulta para buscar el último dato distinto de 0 para 'jg'
+                sql = `SELECT ?? FROM ?? WHERE ?? != 0 ORDER BY fecha_registro DESC LIMIT 1`;
+            } else if (columna === 'hf') {
+                // Si se pregunta por 'hf', asegurarse de incluir 'hf' en la selección sin importar el valor de 'jg'
+                sql = `SELECT ?? FROM ?? ORDER BY fecha_registro DESC LIMIT 1`;
+            }
+
+            // Preparar los valores para la consulta SQL
             const values = [columna, celda, columna];
 
             pool.query(sql, values, (err, result) => {
@@ -28,6 +38,7 @@ const obtenerDatosChart = async (req, res) => {
         res.status(500).send(error.message);
     }
 };
+
 
 const exportarExcel = async (req, res) => {
     try {
