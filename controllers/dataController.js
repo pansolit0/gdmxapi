@@ -3,36 +3,27 @@ const pool = require('../config/db.config');
 const obtenerDatosChart = async (req, res) => {
     try {
         // Recibir datos del cuerpo de la solicitud
-        const celda = req.body.celda;
-        const columna = req.body.columnas;
+        const { celda, columnas: columna } = req.body; // Asumiendo que 'columnas' es el campo correcto en el cuerpo de la solicitud
 
         if (celda && columna) {
             let sql;
-            let values;
+            let values = [];
 
-            // Aplicar lógica condicional basada en la columna especificada
+            // Verificar si la columna especificada es 'jg'
             if (columna === 'jg') {
                 // Consulta especial para 'jg' para obtener el último valor distinto de cero
-                sql = `
-                    SELECT * FROM (
-                        SELECT ??, ?? FROM ?? 
-                        WHERE ?? != 0 
-                        ORDER BY fecha_registro DESC
-                    ) AS filtered_table
-                    GROUP BY ??
-                    ORDER BY fecha_registro DESC
-                    LIMIT 1
-                `;
-                values = [columna, celda, celda, columna, columna];
+                sql = 'SELECT * FROM ?? WHERE ?? != 0 ORDER BY fecha_registro DESC LIMIT 1';
+                values = [celda, columna]; // Asumiendo que 'celda' es el nombre de la tabla
             } else {
-                // Consulta estándar para otras columnas
-                sql = 'SELECT ??, ?? FROM ?? ORDER BY fecha_registro DESC LIMIT 1';
-                values = [columna, celda, celda];
+                // Consulta estándar para cualquier otra columna
+                sql = 'SELECT * FROM ?? ORDER BY fecha_registro DESC LIMIT 1';
+                values = [celda]; // Asumiendo que 'celda' es el nombre de la tabla
             }
 
-            pool.query(sql, values, (err, result) => {
+            // Ejecutar la consulta usando la conexión
+            connection.query(sql, values, (err, result) => {
                 if (err) {
-                    res.status(500).json({ error: "Error executing query: " + err });
+                    res.status(500).json({ error: "Error executing query: " + err.message });
                 } else if (result.length > 0) {
                     res.json(result[0]);
                 } else {
@@ -46,8 +37,6 @@ const obtenerDatosChart = async (req, res) => {
         res.status(500).send(error.message);
     }
 };
-
-
 
 
 const exportarExcel = async (req, res) => {
