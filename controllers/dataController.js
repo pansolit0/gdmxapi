@@ -1,40 +1,43 @@
 const pool = require('../config/db.config');
 
 const obtenerDatosChart = async (req, res) => {
-  try {
-    // Recibir datos del cuerpo de la solicitud
-    const celda = req.body.celda;
-    const columna = req.body.columnas;
+    try {
+        // Recibir datos del cuerpo de la solicitud
+        const celda = req.body.celda;
+        const columna = req.body.columnas;
 
-    if (celda && columna) {
-      // Consulta SQL adaptada para manejar dinámicamente las columnas y celdas
-      const sql = 
-        SELECT
-          *,
-          LAG(${columna}, 1) OVER (PARTITION BY ${celda} ORDER BY fecha_registro DESC) AS ultimo_valor_no_cero
-        FROM
-          tu_tabla
-        WHERE
-          ${celda} = ? AND (${columna} != 0 OR ${columna} IS NOT NULL)
-        ORDER BY
-          fecha_registro DESC
-        LIMIT 1;
-      ;
-      const values = [celda]; // Asegúrate de que esto se corresponda con los parámetros de tu consulta
+        if (celda && columna) {
+            // Construir la consulta para excluir valores cero de la columna especificada y obtener el último valor distinto de cero
+            const sql = `
+                SELECT * FROM (
+                    SELECT ??, ?? FROM ?? 
+                    WHERE ?? != 0 
+                    ORDER BY fecha_registro DESC
+                ) AS filtered_table
+                GROUP BY ??
+                ORDER BY fecha_registro DESC
+                LIMIT 1
+            `;
+            // Añadir el nombre de la columna cuatro veces a los valores, uno para la selección y otro para la condición WHERE, y luego para GROUP BY y ORDER BY
+            const values = [columna, celda, celda, columna, columna];
 
-      const result = await pool.query(sql, values);
-      if (result.length > 0) {
-        res.json(result[0]);
-      } else {
-        res.status(404).json({ error: "No data found" });
-      }
-    } else {
-      res.status(400).json({ error: "Invalid parameters" });
+            pool.query(sql, values, (err, result) => {
+                if (err) {
+                    res.status(500).json({ error: "Error executing query: " + err });
+                } else if (result.length > 0) {
+                    res.json(result[0]);
+                } else {
+                    res.status(404).json({ error: "No data found" });
+                }
+            });
+        } else {
+            res.status(400).json({ error: "Invalid parameters" });
+        }
+    } catch (error) {
+        res.status(500).send(error.message);
     }
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
 };
+
 
 
 const exportarExcel = async (req, res) => {
