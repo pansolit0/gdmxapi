@@ -6,21 +6,11 @@ const obtenerDatosChart = async (req, res) => {
         const celda = req.body.celda;
         const columna = req.body.columnas;
 
+
+
         if (celda && columna) {
-            // Inicializar la consulta SQL base
-            let sql = `SELECT ?? FROM ?? WHERE ?? != 0 ORDER BY fecha_registro DESC LIMIT 1`;
-
-            // Determinar si la consulta involucra la columna 'jg'
-            if (columna === 'jg') {
-                // Modificar la consulta para buscar el último dato distinto de 0 para 'jg'
-                sql = `SELECT ?? FROM ?? WHERE ?? != 0 ORDER BY fecha_registro DESC LIMIT 1`;
-            } else if (columna === 'hf') {
-                // Si se pregunta por 'hf', asegurarse de incluir 'hf' en la selección sin importar el valor de 'jg'
-                sql = `SELECT ?? FROM ?? ORDER BY fecha_registro DESC LIMIT 1`;
-            }
-
-            // Preparar los valores para la consulta SQL
-            const values = [columna, celda, columna];
+            const sql = `SELECT ?? FROM ?? ORDER BY fecha_registro DESC LIMIT 1`;
+            const values = [columna, celda];
 
             pool.query(sql, values, (err, result) => {
                 if (err) {
