@@ -77,17 +77,16 @@ const promedioCatorceDias = async (req, res) => {
 
 const obtenerDatosChartGrafico = async (req, res) => {
     try {
-        const { celda, columnas, rangoHoras } = req.body;
+        const { celda, metrica, rangoHoras } = req.body; // Asegúrate de incluir 'metrica' en el cuerpo de la solicitud
 
         // Calcula el momento de inicio basado en rangoHoras
         const fechaInicio = new Date();
         fechaInicio.setHours(fechaInicio.getHours() - rangoHoras);
 
-        if (celda && columnas) {
-            // Asegúrate de que la consulta SQL seleccione registros dentro del rango de tiempo
-            // Ejemplo usando MySQL, ajusta según tu gestor de base de datos si es necesario
-            const sql = 'SELECT jg, fecha_registro FROM ?? WHERE fecha_registro > ? ORDER BY fecha_registro';
-            const values = [celda, fechaInicio];
+        if (celda && metrica && rangoHoras) {
+            // Asegúrate de que la consulta SQL seleccione la métrica correcta y registros dentro del rango de tiempo
+            const sql = 'SELECT ??, fecha_registro FROM ?? WHERE fecha_registro > ? ORDER BY fecha_registro';
+            const values = [metrica, celda, fechaInicio];
 
             pool.query(sql, values, (err, results) => {
                 if (err) {
@@ -105,6 +104,7 @@ const obtenerDatosChartGrafico = async (req, res) => {
         res.status(500).send(error.message);
     }
 };
+
 
 const obtenerDatosTabla = async (req, res) => {
     try {
