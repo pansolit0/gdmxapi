@@ -30,6 +30,9 @@ const obtenerDatosChart = async (req, res) => {
 };
 
 
+
+
+
 const exportarExcel = async (req, res) => {
     try {
         const nombreTabla = req.body.celda;
@@ -72,8 +75,76 @@ const promedioCatorceDias = async (req, res) => {
     }
 };
 
+const obtenerDatosChartGrafico = async (req, res) => {
+    try {
+        const { celda, columnas, rangoHoras } = req.body;
+
+        // Calcula el momento de inicio basado en rangoHoras
+        const fechaInicio = new Date();
+        fechaInicio.setHours(fechaInicio.getHours() - rangoHoras);
+
+        if (celda && columnas) {
+            // Asegúrate de que la consulta SQL seleccione registros dentro del rango de tiempo
+            // Ejemplo usando MySQL, ajusta según tu gestor de base de datos si es necesario
+            const sql = 'SELECT jg, fecha_registro FROM ?? WHERE fecha_registro > ? ORDER BY fecha_registro';
+            const values = [celda, fechaInicio];
+
+            pool.query(sql, values, (err, results) => {
+                if (err) {
+                    return res.status(500).json({ error: "Error executing query: " + err.message });
+                }
+                if (results.length === 0) {
+                    return res.status(404).json({ error: "No data found" });
+                }
+                res.json(results);
+            });
+        } else {
+            res.status(400).json({ error: "Invalid parameters" });
+        }
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
+
+const obtenerDatosTabla = async (req, res) => {
+    try {
+        const { celda, columnas, rangoHoras } = req.body;
+
+        // Calcula el momento de inicio basado en rangoHoras
+        const fechaInicio = new Date();
+        fechaInicio.setHours(fechaInicio.getHours() - rangoHoras);
+
+        if (celda && columnas && Array.isArray(columnas) && columnas.length > 0) {
+            // Construye la lista de columnas para la consulta SQL
+            const columnasSQL = columnas.join(", ");
+
+            // Asegúrate de que la consulta SQL seleccione registros dentro del rango de tiempo
+            // y solo las columnas especificadas. Ajusta según tu gestor de base de datos si es necesario.
+            const sql = `SELECT ${columnasSQL} FROM ?? WHERE fecha_registro > ? ORDER BY fecha_registro`;
+            const values = [celda, fechaInicio];
+
+            pool.query(sql, values, (err, results) => {
+                if (err) {
+                    return res.status(500).json({ error: "Error executing query: " + err.message });
+                }
+                if (results.length === 0) {
+                    return res.status(404).json({ error: "No data found" });
+                }
+                res.json(results);
+            });
+        } else {
+            res.status(400).json({ error: "Invalid parameters" });
+        }
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
+
+
 module.exports = {
     obtenerDatosChart,
     exportarExcel,
-    promedioCatorceDias
+    promedioCatorceDias,
+    obtenerDatosChartGrafico,
+    obtenerDatosTabla
 }
