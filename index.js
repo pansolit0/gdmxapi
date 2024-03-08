@@ -10,7 +10,7 @@ const io = socketIo(server, {
     methods: ["GET", "POST"]
   }
 });
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORTws || 10000;
 
 // Importa el controlador de sockets
 const { obtenerDatosChartGraficoSocket } = require('./controllers/socketController');
